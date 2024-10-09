@@ -242,7 +242,7 @@ def tests(args, modules, trainset, testset, checkpoint=None, vis_res=False,metr=
         else:
             assert False, "wrong mode"
 
-def test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr=False):
+def test_sec_aggr_end2end(args, modules, trainset, testset, batch_norm,checkpoint=None,metr=False):
     public_model, grad_ex, disaggregator, reconstructor = modules#, decoder, binarizer, wproj = modules
     torch.save({'par_sel': grad_ex.par_sel},'/tmp/runtime_dict')
     
@@ -403,7 +403,7 @@ def test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr
                 print( f"avg_{k}: {avg_metrics[k]} | ", end='' )
         print('')
 
-def test_sec_aggr(args, modules, trainset, testset, checkpoint=None,metr=False):
+def test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=None,metr=False):
     public_model, grad_ex, disaggregator, reconstructor = modules#, decoder, binarizer, wproj = modules
     torch.save({'par_sel': grad_ex.par_sel},'/tmp/runtime_dict')
     

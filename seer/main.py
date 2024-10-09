@@ -29,7 +29,7 @@ if args.dataset.startswith('Cifar10_C'):
 else:
     trainset, testset = globals()[f'datasets_{args.dataset}']()
 if (args.prop_mode == 'thresh') and (args.thresh is None) and (args.task!="secagge2e"):
-    args.thresh=distr.compute_thresh(dataset=trainset,prop=args.prop,batch_size=(args.batch_size_train[0] + args.batch_size_train[1]),num_clients=args.num_clients,num_samples=args.est_thr,bn=distr.batch_norm)
+    args.thresh=distr.compute_thresh(dataset=trainset,prop=args.prop,batch_size=(args.batch_size_train[0] + args.batch_size_train[1]),num_clients=args.num_clients,num_samples=args.est_thr,bn=batch_norm)
     print(f"THRESHOLD for (trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients}): ",args.thresh)
 
 
@@ -39,7 +39,7 @@ else:
     checkpoint = None
 modules=[public_model, grad_ex, disaggregator, reconstructor]
 if args.task == 'train': 
-    train(args, modules, optimizer, trainset, testset, checkpoint=checkpoint)
+    train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=checkpoint)
 elif args.task == 'test':
     tests(args, modules, trainset, testset, checkpoint=checkpoint)
 elif args.task == 'end2end':
@@ -49,11 +49,11 @@ elif args.task == 'end2end_contrast':
 elif args.task == 'secaggr':
     test_sec_aggr(args, modules, trainset, testset, checkpoint=checkpoint,metr=True)
 elif args.task == 'secagge2e':
-    test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=checkpoint,metr=True)
+    test_sec_aggr_end2end(args, modules, trainset, testset, batch_norm,checkpoint=checkpoint,metr=True)
 elif args.task == 'baseline':
     baseline_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=checkpoint)
 elif args.task == 'tests':
-    test_sec_aggr(args, modules, trainset, testset, checkpoint=checkpoint)
+    test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=checkpoint)
     test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=checkpoint)
 else:
     tests(args, modules, loader_train, loader_test,checkpoint=checkpoint, vis_res=True)
