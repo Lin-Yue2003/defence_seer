@@ -37,14 +37,14 @@ def train(args, modules, optimizer, trainset, testset, checkpoint=None):
     factor = 1
     log_gradient_norms=False
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'],args.device)
         optimizer_to(optimizer,args.device)
         losses=Losses( public_model.parameters(), args )
         filters=Filters()
@@ -90,7 +90,7 @@ def train(args, modules, optimizer, trainset, testset, checkpoint=None):
                 pos_batch=((j%2)==1)
                 dpmeans=scores
                 dpmeans = dpmeans[order]
-                newmeans = distr.tweak(dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal).squeeze()
+                newmeans = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal).squeeze()
                 if args.prop in ['bright','dark']:
                     datapoints = datapoints + (newmeans - dpmeans).unsqueeze(1).unsqueeze(2).unsqueeze(3)
                 elif args.prop in ['red']:
@@ -101,22 +101,22 @@ def train(args, modules, optimizer, trainset, testset, checkpoint=None):
             public_labels = public_labels[order]
 
             with torch.no_grad():
-                neg_ix_i=torch.arange(args.batch_size_train[0]).cuda()
-                pos_ix_i=torch.arange(args.batch_size_train[0],args.batch_size_train[0]+args.batch_size_train[1]).cuda()
-                neg_ix_o=torch.arange(args.jac_size).cuda()
+                neg_ix_i=torch.arange(args.batch_size_train[0]).cuda().to(args.device)
+                pos_ix_i=torch.arange(args.batch_size_train[0],args.batch_size_train[0]+args.batch_size_train[1]).cuda().to(args.device)
+                neg_ix_o=torch.arange(args.jac_size).cuda().to(args.device)
                 neg_ix_o_a=neg_ix_o[0:1]
                 neg_ix_o_b=neg_ix_o[1:2]
                 assert args.jac_size==2, "indices above are hardcoded"
-                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda()
+                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda().to(args.device)
 
-                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device='cuda')
+                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device=args.device)
                 assert pos_ix_i.shape[0]==pos_ix_o.shape[0], "compute precisely the grad for each positive sample"
-                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device='cuda')
+                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device=args.device)
                 #jac[neg_ix_i.unsqueeze(1),neg_ix_o.unsqueeze(0)]=torch.nn.init.orthogonal_(torch.randn(neg_ix_i.shape[0],neg_ix_o.shape[0],device='cuda')).cuda()
                 if not pos_batch:
-                    neg_ix_i=torch.arange(args.batch_size_train[0]+args.batch_size_train[1]).cuda()
-                jac[neg_ix_i.unsqueeze(1),neg_ix_o_a.unsqueeze(0)]=torch.nn.init.orthogonal_(torch.randn(neg_ix_i.shape[0],neg_ix_o_a.shape[0],device='cuda')).cuda()
-                jac[neg_ix_i.unsqueeze(1),neg_ix_o_b.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o_b.shape[0],device='cuda').cuda() / (neg_ix_i.shape[0]**0.5)
+                    neg_ix_i=torch.arange(args.batch_size_train[0]+args.batch_size_train[1]).cuda().to(args.device)
+                jac[neg_ix_i.unsqueeze(1),neg_ix_o_a.unsqueeze(0)]=torch.nn.init.orthogonal_(torch.randn(neg_ix_i.shape[0],neg_ix_o_a.shape[0],device=args.device)).cuda().to(args.device)
+                jac[neg_ix_i.unsqueeze(1),neg_ix_o_b.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o_b.shape[0],device=args.device).cuda().to(args.device) / (neg_ix_i.shape[0]**0.5)
 
             bdW, W = grad_ex(datapoints,public_labels.to(args.device),losses.public_loss,flat_cat=True,single_grad=False,jac=jac.t()) 
             assert bdW.shape[0]==jac.shape[1]
@@ -221,13 +221,13 @@ def train(args, modules, optimizer, trainset, testset, checkpoint=None):
             tests(args2, modules, trainset, testset, vis_res=True,metr=metr)
 
 
-def load_models(public_model,decoder,checkpoint):
+def load_models(args,public_model,decoder,checkpoint):
         current={
                 'public_model_state_dict': public_model.state_dict(),
                 'decoder_state_dict': decoder.state_dict(),
                 }
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
-        decoder.load_state_dict(checkpoint['decoder_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
+        decoder.load_state_dict(checkpoint['decoder_state_dict'],args.device)
         return current
 
 def tests(args, modules, trainset, testset, checkpoint=None, vis_res=False,metr=False):
@@ -253,11 +253,11 @@ def test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -414,11 +414,11 @@ def test_sec_aggr(args, modules, trainset, testset, checkpoint=None,metr=False):
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -481,10 +481,10 @@ def test_sec_aggr(args, modules, trainset, testset, checkpoint=None,metr=False):
                 datapoints_i = datapoints_i[order]
                 public_labels[ i_st : i_en ] = public_labels[ i_st : i_en ][order]
                 pos_batch=(b==0)
-                twk = distr.tweak(dms=dpmeans.unsqueeze(0).unsqueeze(0).cpu(),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal)
+                twk = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0).cpu(),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal)
                 if twk is None:
                     twk=dpmeans
-                newmeans = twk.squeeze().cuda()
+                newmeans = twk.squeeze().cuda().to(args.device)
                 if args.prop in ['bright','dark']:
                     datapoints_i = datapoints_i + (newmeans - dpmeans).unsqueeze(1).unsqueeze(2).unsqueeze(3)
                 elif args.prop in ['red']:
@@ -551,11 +551,11 @@ def test_end2end(args, modules, trainset, testset, checkpoint=None):
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -615,7 +615,7 @@ def test_end2end(args, modules, trainset, testset, checkpoint=None):
             reconstructor_o = reconstructor(disaggregator_o).reshape(-1,*args.input_size)
 
             #DSNR calculation
-            bdWj, _ = grad_ex(datapoints,public_labels,losses.public_loss,flat_cat=False, single_grad=False,jac=torch.eye(testing_set.batch_size).to('cuda'),testing=True,par_sel=False)
+            bdWj, _ = grad_ex(datapoints,public_labels,losses.public_loss,flat_cat=False, single_grad=False,jac=torch.eye(testing_set.batch_size).to(args.device),testing=True,par_sel=False)
             gradnames = []
             for m in grad_ex.public_model.named_parameters():
                 gradnames.append(m[0])
@@ -668,17 +668,17 @@ def test_end2end(args, modules, trainset, testset, checkpoint=None):
 
                 public_labels = public_labels[order]
 
-                neg_ix_i=torch.arange(datapoints.shape[0]-1).cuda()
-                pos_ix_i=torch.arange(datapoints.shape[0]-1,datapoints.shape[0]).cuda()
-                neg_ix_o=torch.arange(1).cuda()
+                neg_ix_i=torch.arange(datapoints.shape[0]-1).cuda().to(args.device)
+                pos_ix_i=torch.arange(datapoints.shape[0]-1,datapoints.shape[0]).cuda().to(args.device)
+                neg_ix_o=torch.arange(1).cuda().to(args.device)
                 #TODO hardcoded 1
-                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda()
+                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda().to(args.device)
 
-                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device='cuda')
+                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device=args.device)
                 assert pos_ix_i.shape[0]==pos_ix_o.shape[0], "compute precisely the grad for each positive sample"
-                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device='cuda')
+                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device=args.device)
                 assert neg_ix_o.shape[0]==1, "aggregate all the negatives"
-                jac[neg_ix_i.unsqueeze(1),neg_ix_o.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o.shape[0],device='cuda').cuda()
+                jac[neg_ix_i.unsqueeze(1),neg_ix_o.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o.shape[0],device=args.device).cuda().to(args.device)
 
             bdW, W = grad_ex(datapoints,public_labels.to(args.device),losses.public_loss,flat_cat=True,single_grad=False,jac=jac.t()) 
             assert bdW.shape[0]==jac.shape[1]
@@ -762,11 +762,11 @@ def test_end2end_fix_contrast(args, modules, trainset, testset, checkpoint=None)
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -853,7 +853,7 @@ def test_end2end_fix_contrast(args, modules, trainset, testset, checkpoint=None)
             reconstructor_o /= best_lb
 
             #DSNR calculation
-            bdWj, _ = grad_ex(datapoints,public_labels,losses.public_loss,flat_cat=False, single_grad=False,jac=torch.eye(testing_set.batch_size).to('cuda'),testing=True,par_sel=False)
+            bdWj, _ = grad_ex(datapoints,public_labels,losses.public_loss,flat_cat=False, single_grad=False,jac=torch.eye(testing_set.batch_size).to(args.device),testing=True,par_sel=False)
             gradnames = []
             for m in grad_ex.public_model.named_parameters():
                 gradnames.append(m[0])
@@ -900,17 +900,17 @@ def test_end2end_fix_contrast(args, modules, trainset, testset, checkpoint=None)
                 datapoints = datapoints[order]
                 public_labels = public_labels[order]
 
-                neg_ix_i=torch.arange(datapoints.shape[0]-1).cuda()
-                pos_ix_i=torch.arange(datapoints.shape[0]-1,datapoints.shape[0]).cuda()
-                neg_ix_o=torch.arange(1).cuda()
+                neg_ix_i=torch.arange(datapoints.shape[0]-1).cuda().to(args.device)
+                pos_ix_i=torch.arange(datapoints.shape[0]-1,datapoints.shape[0]).cuda().to(args.device)
+                neg_ix_o=torch.arange(1).cuda().to(args.device)
                 #TODO hardcoded 1
-                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda()
+                pos_ix_o=torch.arange(neg_ix_o.shape[0],neg_ix_o.shape[0]+pos_ix_i.shape[0]).cuda().to(args.device)
 
-                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device='cuda')
+                jac=torch.zeros(neg_ix_i.shape[0]+pos_ix_i.shape[0],neg_ix_o.shape[0]+pos_ix_o.shape[0],device=args.device)
                 assert pos_ix_i.shape[0]==pos_ix_o.shape[0], "compute precisely the grad for each positive sample"
-                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device='cuda')
+                jac[pos_ix_i.unsqueeze(1),pos_ix_o.unsqueeze(0)]=torch.eye(pos_ix_i.shape[0],device=args.device)
                 assert neg_ix_o.shape[0]==1, "aggregate all the negatives"
-                jac[neg_ix_i.unsqueeze(1),neg_ix_o.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o.shape[0],device='cuda').cuda()
+                jac[neg_ix_i.unsqueeze(1),neg_ix_o.unsqueeze(0)]=torch.ones(neg_ix_i.shape[0],neg_ix_o.shape[0],device=args.device).cuda().to(args.device)
 
             bdW, W = grad_ex(datapoints,public_labels.to(args.device),losses.public_loss,flat_cat=True,single_grad=False,jac=jac.t()) 
             assert bdW.shape[0]==jac.shape[1]
@@ -948,11 +948,11 @@ def baseline_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None)
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        public_model.load_state_dict(checkpoint['public_model_state_dict'],args.device)
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],args.device)
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],args.device)
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )

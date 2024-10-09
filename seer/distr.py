@@ -2,9 +2,8 @@ import torch
 from utils import *
 
 normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
-batch_norm=torch.nn.BatchNorm1d(1, eps=1e-05, affine=False, track_running_stats=False, device='cuda', dtype=None)
 
-def tweak(dms: torch.Tensor, pos: bool, prop: str, thresh: float, disag_size: int, bn: torch.nn.modules.batchnorm.BatchNorm1d, N: torch.distributions.normal.Normal):
+def tweak(args,dms: torch.Tensor, pos: bool, prop: str, thresh: float, disag_size: int, bn: torch.nn.modules.batchnorm.BatchNorm1d, N: torch.distributions.normal.Normal):
     with torch.no_grad():
         #assert dms.device.type=='cpu', "cpu!"
         assert dms.shape[0]==dms.shape[1]==1, "unsqueeze!"
@@ -17,14 +16,14 @@ def tweak(dms: torch.Tensor, pos: bool, prop: str, thresh: float, disag_size: in
             disag_size=1/(1-N.cdf(th))
         else:
             th=N.icdf(torch.tensor(1-1/disag_size))
-        th=th.cuda()
-        thl=(th-N.icdf(torch.tensor(1-2/disag_size)).cuda())/2
+        th=th.cuda().to(args.device)
+        thl=(th-N.icdf(torch.tensor(1-2/disag_size)).cuda().to(args.device))/2
         tw=bn(dms)
         if prop in ['bright','red','dark']:
             assert (tw!=tw.sort().values).sum()==0, "sort!"
         if not pos:
             if torch.rand(1)<0.5:
-                top1_tgt=-N.sample().abs().cuda()*thl+th
+                top1_tgt=-N.sample().abs().cuda().to(args.device)*thl+th
                 tw[0,0,-1]=top1_tgt
                 tw=bn(tw).sort().values
         for nmi in range(3000):
@@ -35,12 +34,12 @@ def tweak(dms: torch.Tensor, pos: bool, prop: str, thresh: float, disag_size: in
                     tw=(-tw)#.flip(dims=(-1,))
                     return tw*sd+mn
             if pos:
-                top1_tgt=N.sample().abs().cuda()*thl+th
-                top2_tgt=-N.sample().abs().cuda()*thl+th
+                top1_tgt=N.sample().abs().cuda().to(args.device)*thl+th
+                top2_tgt=-N.sample().abs().cuda().to(args.device)*thl+th
                 tw[0,0,-1]=top1_tgt
                 tw[0,0,-(pos+1)]=top2_tgt
             else:
-                top1_tgt=-N.sample().abs().cuda()*thl+th
+                top1_tgt=-N.sample().abs().cuda().to(args.device)*thl+th
                 tw[0,0,-1]=top1_tgt
             tw=bn(tw).sort().values
         print('SKIPPING BATCH')
