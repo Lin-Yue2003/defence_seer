@@ -29,7 +29,7 @@ if args.dataset.startswith('Cifar10_C'):
 else:
     trainset, testset = globals()[f'datasets_{args.dataset}']()
 if (args.prop_mode == 'thresh') and (args.thresh is None) and (args.task!="secagge2e"):
-    args.thresh=distr.compute_thresh(dataset=trainset,prop=args.prop,batch_size=(args.batch_size_train[0] + args.batch_size_train[1]),num_clients=args.num_clients,num_samples=args.est_thr,bn=distr.batch_norm)
+    args.thresh=distr.compute_thresh(dataset=trainset,prop=args.prop,batch_size=(args.batch_size_train[0] + args.batch_size_train[1]),num_clients=args.num_clients,num_samples=args.est_thr,bn=batch_norm)
     print(f"THRESHOLD for (trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients}): ",args.thresh)
 
 
