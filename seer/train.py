@@ -24,7 +24,7 @@ def optimizer_to(optim, device):
                     if subparam._grad is not None:
                         subparam._grad.data = subparam._grad.data.to(device)
 
-def train(args, modules, optimizer, trainset, testset, checkpoint=None):
+def train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=None):
     loader_train = torch.utils.data.DataLoader( trainset, num_workers=2, batch_size=args.batch_size_train[0] + args.batch_size_train[1], sampler = torch.utils.data.RandomSampler(trainset, replacement=False, num_samples=int(1e10)))
     loader_test = torch.utils.data.DataLoader( testset, num_workers=2, batch_size=args.batch_size_train[0] + args.batch_size_train[1], sampler = torch.utils.data.RandomSampler(trainset, replacement=False, num_samples=int(1e10)))
     public_model, grad_ex, disaggregator, reconstructor = modules#, grad_sel = modules#, binarizer= modules#, decoder, wproj = modules
@@ -90,7 +90,7 @@ def train(args, modules, optimizer, trainset, testset, checkpoint=None):
                 pos_batch=((j%2)==1)
                 dpmeans=scores
                 dpmeans = dpmeans[order]
-                newmeans = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal).squeeze()
+                newmeans = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=batch_norm,N=distr.normal).squeeze()
                 if args.prop in ['bright','dark']:
                     datapoints = datapoints + (newmeans - dpmeans).unsqueeze(1).unsqueeze(2).unsqueeze(3)
                 elif args.prop in ['red']:
@@ -323,7 +323,7 @@ def test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr
                 dpmeans = dpmeans[order]
                 datapoints_i = datapoints_i[order]
                 public_labels[ i_st : i_en ] = public_labels[ i_st : i_en ][order]
-                num_pos = distr.count(dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=None,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal)
+                num_pos = distr.count(dms=dpmeans.unsqueeze(0).unsqueeze(0),pos=None,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=batch_norm,N=distr.normal)
                 datapoints_i=datapoints_i.to(args.device)
                 for p in range(num_pos):
                     datapoint_true.append(datapoints_i[-(p+1)])
@@ -481,7 +481,7 @@ def test_sec_aggr(args, modules, trainset, testset, checkpoint=None,metr=False):
                 datapoints_i = datapoints_i[order]
                 public_labels[ i_st : i_en ] = public_labels[ i_st : i_en ][order]
                 pos_batch=(b==0)
-                twk = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0).cpu(),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=distr.batch_norm,N=distr.normal)
+                twk = distr.tweak(args,dms=dpmeans.unsqueeze(0).unsqueeze(0).cpu(),pos=pos_batch,prop=args.prop,thresh=args.thresh,disag_size=args.num_clients*(args.batch_size_train[0] + args.batch_size_train[1]),bn=batch_norm,N=distr.normal)
                 if twk is None:
                     twk=dpmeans
                 newmeans = twk.squeeze().cuda().to(args.device)
