@@ -236,7 +236,7 @@ def tests(args, modules, trainset, testset, batch_norm,checkpoint=None, vis_res=
         args.attack_cfg=cfg
         if args.prop_mode=='thresh':
             test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=None,metr=metr)
-            test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr=metr)
+            test_sec_aggr_end2end(args, modules, trainset, testset, batch_norm,checkpoint=None,metr=metr)
         elif args.prop_mode=='max':
             test_end2end(args, modules, trainset, testset, checkpoint=None)
         else:
