@@ -105,7 +105,7 @@ def opt_thresh(cdf1, cdf2, num_clients):
     def obj(th):
         return -(1-cdf1(th))*cdf2(th)*(cdf1(th)**(num_clients-1))
     from scipy import optimize
-    argmin_th=optimize.golden(obj,brack=(0,6))
+    argmin_th=optimize.golden(obj)
     return argmin_th
 
 def compute_thresh(dataset,prop,batch_size,num_clients,num_samples,bn):
