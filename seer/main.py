@@ -44,7 +44,7 @@ modules=[public_model, grad_ex, disaggregator, reconstructor]
 if args.task == 'train': 
     train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=checkpoint)
 elif args.task == 'test':
-    tests(args, modules, trainset, testset, checkpoint=checkpoint)
+    tests(args, modules, trainset, testset, batch_norm,checkpoint=checkpoint)
 elif args.task == 'end2end':
     test_end2end(args, modules, trainset, testset, checkpoint=checkpoint)
 elif args.task == 'end2end_contrast':
@@ -59,4 +59,4 @@ elif args.task == 'tests':
     test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=checkpoint)
     test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=checkpoint)
 else:
-    tests(args, modules, loader_train, loader_test,checkpoint=checkpoint, vis_res=True)
+    tests(args, modules, loader_train, loader_test,batch_norm,checkpoint=checkpoint, vis_res=True)

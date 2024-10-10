@@ -218,7 +218,7 @@ def train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=Non
                     }, model_path)
             args2 = copy(args)
             args2.checkpoint = model_path
-            tests(args2, modules, trainset, testset, vis_res=True,metr=metr)
+            tests(args2, modules, trainset, testset, batch_norm,vis_res=True,metr=metr)
 
 
 def load_models(args,public_model,decoder,checkpoint):
@@ -230,12 +230,12 @@ def load_models(args,public_model,decoder,checkpoint):
         decoder.load_state_dict(checkpoint['decoder_state_dict'],args.device)
         return current
 
-def tests(args, modules, trainset, testset, checkpoint=None, vis_res=False,metr=False):
+def tests(args, modules, trainset, testset, batch_norm,checkpoint=None, vis_res=False,metr=False):
     cfgs=args.attack_cfg.split('+')
     for cfg in cfgs:
         args.attack_cfg=cfg
         if args.prop_mode=='thresh':
-            test_sec_aggr(args, modules, trainset, testset, checkpoint=None,metr=metr)
+            test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=None,metr=metr)
             test_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None,metr=metr)
         elif args.prop_mode=='max':
             test_end2end(args, modules, trainset, testset, checkpoint=None)
