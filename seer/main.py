@@ -8,6 +8,7 @@ from model import *
 args = get_args()
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
+normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
 batch_norm=torch.nn.BatchNorm1d(1, eps=1e-05, affine=False, track_running_stats=False, device=args.device, dtype=None)
 
 
