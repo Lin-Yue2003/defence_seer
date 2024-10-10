@@ -4,6 +4,7 @@ from data import *
 from PIL import Image
 import time
 from model import *
+import torch
 
 args = get_args()
 torch.manual_seed(args.rng_seed)
