@@ -13,8 +13,8 @@ python3 main.py \
 --attack_cfg modern \
 --print_interval 3 \
 --num_epochs 1000 \
---epoch_steps 10 \
---test_interval 1 \
+--epoch_steps 1000 \
+--test_interval 10 \
 --big_test_interval 100 \
 --act ReLU \
 --public_labels True \
