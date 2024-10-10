@@ -14,7 +14,7 @@ python3 main.py \
 --print_interval 3 \
 --num_epochs 1000 \
 --epoch_steps 1000 \
---test_interval 10 \
+--test_interval 3 \
 --big_test_interval 100 \
 --act ReLU \
 --public_labels True \
