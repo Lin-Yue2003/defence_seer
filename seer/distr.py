@@ -2,7 +2,7 @@ import torch
 from utils import *
 
 normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
-batch_norm=torch.nn.BatchNorm1d(1, eps=1e-05, affine=False, track_running_stats=False, device=args.device, dtype=None)
+
 
 def tweak(args,dms: torch.Tensor, pos: bool, prop: str, thresh: float, disag_size: int, bn: torch.nn.modules.batchnorm.BatchNorm1d, N: torch.distributions.normal.Normal):
     with torch.no_grad():
