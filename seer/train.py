@@ -218,7 +218,7 @@ def train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=Non
                     }, model_path)
             args2 = copy(args)
             args2.checkpoint = model_path
-            tests(args2, modules, trainset, testset, batch_norm,vis_res=True,metr=metr)
+            #tests(args2, modules, trainset, testset, batch_norm,vis_res=True,metr=metr)
 
 
 def load_models(args,public_model,decoder,checkpoint):
