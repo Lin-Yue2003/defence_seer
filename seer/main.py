@@ -5,6 +5,7 @@ from PIL import Image
 import time
 from model import *
 import torch
+import distr
 
 args = get_args()
 torch.manual_seed(args.rng_seed)
