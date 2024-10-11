@@ -11,9 +11,9 @@ python3 main.py \
 --res_path ../models \
 --attack_cfg modern \
 --print_interval 30 \
---num_epochs 1000 \
+--num_epochs 100 \
 --epoch_steps 1000 \
---test_interval 10 \
+--test_interval 50 \
 --big_test_interval 100 \
 --act ReLU \
 --public_labels True \
