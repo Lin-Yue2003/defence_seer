@@ -538,7 +538,7 @@ def property_scores(datapoints,prop,labels=None):
 
                                 [[ 0.0147, -0.0921,  0.1279],
                                 [-0.1277, -0.1600,  0.0268],
-                                [ 0.0624,  0.0971,  0.1694]]]],device='cuda')
+                                [ 0.0624,  0.0971,  0.1694]]]],device=datapoints.device)
         weight -= weight.mean()
         convolved=torch.nn.functional.conv2d(datapoints, weight, bias=None, stride=1, padding=0, dilation=1, groups=1)
         scores = convolved.mean((1,2,3))
