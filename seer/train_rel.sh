@@ -8,10 +8,10 @@ python3 main.py \
 --acc_grad 10 \
 --learning_rate 1e-4 \
 --data_path ../data \
---res_path ../models/cifar100 \
+--res_path ../models/cifar10\
 --attack_cfg modern \
 --print_interval 30 \
---num_epochs 300 \
+--num_epochs 200 \
 --epoch_steps 1000 \
 --test_interval 50 \
 --big_test_interval 100 \
