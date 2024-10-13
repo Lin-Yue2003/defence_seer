@@ -529,16 +529,16 @@ def property_scores(datapoints,prop,labels=None):
         scores = convolved.mean((1,2,3))
     elif prop == 'rand_conv1':
         weight = torch.tensor([[[[-0.0373, -0.0297,  0.1309],
-                                [ 0.1135, -0.0817, -0.1603],
-                                [-0.0151,  0.1849,  0.1139]],
+                                 [ 0.1135, -0.0817, -0.1603],
+                                 [-0.0151,  0.1849,  0.1139]],
 
                                 [[-0.0668,  0.1902,  0.1110],
-                                [-0.1343, -0.0033, -0.0864],
-                                [-0.1639, -0.1398,  0.0666]],
+                                 [-0.1343, -0.0033, -0.0864],
+                                 [-0.1639, -0.1398,  0.0666]],
 
                                 [[ 0.0147, -0.0921,  0.1279],
-                                [-0.1277, -0.1600,  0.0268],
-                                [ 0.0624,  0.0971,  0.1694]]]],device=datapoints.device)
+                                 [-0.1277, -0.1600,  0.0268],
+                                 [ 0.0624,  0.0971,  0.1694]]]],device=datapoints.device)
         weight -= weight.mean()
         convolved=torch.nn.functional.conv2d(datapoints, weight, bias=None, stride=1, padding=0, dilation=1, groups=1)
         scores = convolved.mean((1,2,3))

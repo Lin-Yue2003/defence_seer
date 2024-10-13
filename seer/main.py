@@ -9,25 +9,21 @@ import distr
 
 args = get_args()
 args.prop_mode = 'max'
-args.
-python3 main.py 
---prop_mode max \
---acc_grad 10 \
---learning_rate 1e-4 \
---data_path ../data \
---res_path ../models/cifar10\
---attack_cfg modern \
---print_interval 30 \
---num_epochs 200 \
---epoch_steps 1000 \
---test_interval 50 \
---big_test_interval 100 \
---act ReLU \
---public_labels True \
---par_sel_size 8400 \
---par_sel_frac 0.001 \
---mid_rep_frac 1.0 \
---num_test_img 20 ${@:2}
+args.acc_grad = 10
+args.learning_rate = 1e-4
+args.data_path = '../data'
+args.res_path ='../models/cifar10'
+args.attack_cfg ='modern'
+args.print_interval = 30
+args.num_epochs = 200
+args.epoch_steps = 1000
+args.test_interval = 50
+args.big_test_interval = 10000
+args.act = 'ReLU'
+args.public_labels = True
+args.par_sel_size = 8400
+args.par_sel_frac = 0.001
+args.mid_rep_frac = 1.0
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
 normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
