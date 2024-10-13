@@ -9,8 +9,8 @@ def get_args(argv=None):
 
     # Neptune
     parser.add_argument('--neptune', type=str, help='Neptune project name, leave empty to not use neptune', default=None)
-    parser.add_argument('--neptune_label', dest='label', type=str, help='Neptune label of the experiment')
-    parser.add_argument('--neptune_offline', action='store_true', help='Run Neptune in offline mode')
+    parser.add_argument('--neptune_label', dest='label', type=str, help='Neptune label of the experiment', default=None)
+    parser.add_argument('--neptune_offline', action='store_true', help='Run Neptune in offline mode', default=None)
 
     
     # Setup
@@ -20,7 +20,7 @@ def get_args(argv=None):
     ##parser.add_argument('--pos_volume', type=int, default=1, help='How many positive examples we can fit in memory at the same time')
     ##parser.add_argument('--neg_volume', type=int, default=None, help='How many negative examples we can fit in memory at the same time')
     parser.add_argument('--data_path', type=str, help='Path to data', default='../data')
-    parser.add_argument('--data_loaders', type=str, help='Path to stored data loaders')
+    parser.add_argument('--data_loaders', type=str, help='Path to stored data loaders', default=None)
     parser.add_argument('--res_path', type=str, help='Path to resulting model', default='../models')
     parser.add_argument('--checkpoint', type=str, help='Path to model to load', default=None)
     parser.add_argument('--print_interval', type=int, default=50, help='How often to print')
@@ -34,15 +34,15 @@ def get_args(argv=None):
     parser.add_argument('--epoch_steps', type=int, default=1000, help='Number of sampled batches per epoch')
     parser.add_argument('--current_epoch', type=int, default=None, help='epoch to start from')
     parser.add_argument('--acc_grad', type=int, default=1, help='accumulate the gradients before taking a step')
-    parser.add_argument('--disag_size', type=int, help='another way to define the desired frequency of the property')
+    parser.add_argument('--disag_size', type=int, help='another way to define the desired frequency of the property', default=None)
     parser.add_argument('--num_clients', type=int, default=1, help='the number of clients')
-    parser.add_argument('--est_thr', type=int, help='number of samles to estimate the thresh')
+    parser.add_argument('--est_thr', type=int, help='number of samles to estimate the thresh', default=None)
     parser.add_argument('-lr','--learning_rate', type=float, default=1e-5, help='Learning rate')
     ##parser.add_argument('--neg_pos_log2_rat', type=float, default=0, help='base 2 logarithm of the ratio between negative and positive term in the objective')
     parser.add_argument('--sched_x_1', type=float, default=0, help='base 2 logarithm of the ratio between negative and positive term in the objective')
-    parser.add_argument('--sched_x_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective')
+    parser.add_argument('--sched_x_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective', default=None)
     parser.add_argument('--sched_y_1', type=float, default=-2, help='base 2 logarithm of the ratio between negative and positive term in the objective')
-    parser.add_argument('--sched_y_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective')
+    parser.add_argument('--sched_y_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective', default=None)
     parser.add_argument('-btr','--batch_size_train', type=str, default=8, help='Batch size for training')
     parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Torch device')
 
@@ -56,8 +56,8 @@ def get_args(argv=None):
     ##parser.add_argument('--num_ratios', type=int, default=3, help='Max number of combinations for noise-to-ratio loss')
     parser.add_argument('--prop', type=str, choices=['bright', 'dark', 'red','blue','green', 'hedge', 'vedge','rand_conv'], default='bright', help='Network activation function')
     parser.add_argument('--prop_conv', default=None, help='property kernel function')
-    parser.add_argument('--prop_mode', type=str, choices=['max', 'thresh'], required=True, help='whether to take the maximum of the property, or at a given threshold')
-    parser.add_argument('--thresh', type=float, help='threshold after batch normalization')
+    parser.add_argument('--prop_mode', type=str, choices=['max', 'thresh'], required=True, help='whether to take the maximum of the property, or at a given threshold', default=None)
+    parser.add_argument('--thresh', type=float, help='threshold after batch normalization', default=None)
     
     # FMS params
     parser.add_argument('--decoder', type=str, choices=['orig', 'nomid', 'deconv'], default='nomid', help='whether to take the maximum of the property, or at a given threshold')
