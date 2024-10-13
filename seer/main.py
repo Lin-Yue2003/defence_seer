@@ -9,8 +9,8 @@ import distr
 
 args = get_args()
 args.prop_mode = 'max'
-args.btr = '63_1_2'
-args.bte = '63_1'
+args.batch_size_train = '63_1_2'
+args.batch_size_test = '63_1'
 args.acc_grad = 10
 args.learning_rate = 1e-4
 args.data_path = '../data'
