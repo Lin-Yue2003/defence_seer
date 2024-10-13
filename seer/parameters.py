@@ -132,7 +132,8 @@ def get_args(argv=None):
             args.case_cfg = f'Cifar10_C_sanity_check'
         else:
             args.case_cfg = f'{args.dataset}_sanity_check'
-
+    print(type(args.batch_size_train))
+    print(args.batch_size_train)
     parsed_und=args.batch_size_train.split('_')
     btr=[int(e) for e in parsed_und]
     args.batch_size_train=btr
