@@ -43,7 +43,7 @@ def get_args(argv=None):
     parser.add_argument('--sched_x_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective', default=None)
     parser.add_argument('--sched_y_1', type=float, default=-2, help='base 2 logarithm of the ratio between negative and positive term in the objective')
     parser.add_argument('--sched_y_end', type=float, help='base 2 logarithm of the ratio between negative and positive term in the objective', default=None)
-    parser.add_argument('-btr','--batch_size_train', type=str, default=8, help='Batch size for training')
+    parser.add_argument('-btr','--batch_size_train', type=str, default='63_1_2', help='Batch size for training')
     parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Torch device')
 
     # Dataset params
@@ -85,7 +85,7 @@ def get_args(argv=None):
     parser.add_argument('--attack_cfg', type=str, default='modern', help='What attack config from Geiping to use')
     parser.add_argument('--test_interval', type=int, default=1, help='Test every x epochs')
     parser.add_argument('--big_test_interval', type=int, default=100, help='Test every x epochs')
-    parser.add_argument('-bte','--batch_size_test', type=str, default=8, help="Batch size for testing")
+    parser.add_argument('-bte','--batch_size_test', type=str, default='63_1', help="Batch size for testing")
     parser.add_argument('--num_test_img', type=int, default=5, help="How many images to test with")
     parser.add_argument('--case_cfg', type=str, default=None, help='What case config from Geiping to use')
     ###parser.add_argument('--pos_pick', type=int, default=1, help='which positive sample from the batch to choose; 0 stands for random, 1 is highest, 2 is second highest, etc...')
