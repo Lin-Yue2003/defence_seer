@@ -56,7 +56,7 @@ def get_args(argv=None):
     ##parser.add_argument('--num_ratios', type=int, default=3, help='Max number of combinations for noise-to-ratio loss')
     parser.add_argument('--prop', type=str, choices=['bright', 'dark', 'red','blue','green', 'hedge', 'vedge','rand_conv'], default='bright', help='Network activation function')
     parser.add_argument('--prop_conv', default=None, help='property kernel function')
-    parser.add_argument('--prop_mode', type=str, choices=['max', 'thresh'], required=True, help='whether to take the maximum of the property, or at a given threshold', default=None)
+    parser.add_argument('--prop_mode', type=str, choices=['max', 'thresh'], help='whether to take the maximum of the property, or at a given threshold', default=None)
     parser.add_argument('--thresh', type=float, help='threshold after batch normalization', default=None)
     
     # FMS params
