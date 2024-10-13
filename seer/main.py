@@ -8,24 +8,7 @@ import torch
 import distr
 
 args = get_args()
-args.prop_mode = 'max'
-args.batch_size_train = '63_1_2'
-args.batch_size_test = '63_1'
-args.acc_grad = 10
-args.learning_rate = 1e-4
-args.data_path = '../data'
-args.res_path ='../models/cifar10'
-args.attack_cfg ='modern'
-args.print_interval = 30
-args.num_epochs = 200
-args.epoch_steps = 1000
-args.test_interval = 50
-args.big_test_interval = 10000
-args.act = 'ReLU'
-args.public_labels = True
-args.par_sel_size = 8400
-args.par_sel_frac = 0.001
-args.mid_rep_frac = 1.0
+args.prop = 'rand_conv1'
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
 normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
