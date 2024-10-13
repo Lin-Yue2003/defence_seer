@@ -11,10 +11,10 @@ python3 main.py \
 --res_path ../models/cifar100 \
 --attack_cfg modern \
 --print_interval 30 \
---num_epochs 300 \
+--num_epochs 200 \
 --epoch_steps 1000 \
 --test_interval 50 \
---big_test_interval 100 \
+--big_test_interval 10000 \
 --act ReLU \
 --public_labels True \
 --par_sel_size 8400 \
