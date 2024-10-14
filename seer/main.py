@@ -8,7 +8,6 @@ import torch
 import distr
 
 args = get_args()
-args.prop = 'rand_conv1'
 print(f"trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients}")
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
