@@ -8,7 +8,7 @@ import torch
 import distr
 
 args = get_args()
-print(f"trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients}")
+print(f"trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients},res_path={args.res_path}")
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
 normal=torch.distributions.normal.Normal(torch.tensor([0.0]), torch.tensor([1.0]))
