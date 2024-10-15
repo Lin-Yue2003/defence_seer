@@ -37,14 +37,14 @@ def train(args, modules, optimizer, trainset, testset, batch_norm,checkpoint=Non
     factor = 1
     log_gradient_norms=False
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'],device=args.device)
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         optimizer_to(optimizer,args.device)
         losses=Losses( public_model.parameters(), args )
         filters=Filters()
@@ -226,8 +226,8 @@ def load_models(args,public_model,decoder,checkpoint):
                 'public_model_state_dict': public_model.state_dict(),
                 'decoder_state_dict': decoder.state_dict(),
                 }
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
-        decoder.load_state_dict(checkpoint['decoder_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
+        decoder.load_state_dict(checkpoint['decoder_state_dict'])
         return current
 
 def tests(args, modules, trainset, testset, batch_norm,checkpoint=None, vis_res=False,metr=False):
@@ -253,11 +253,11 @@ def test_sec_aggr_end2end(args, modules, trainset, testset, batch_norm,checkpoin
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -414,11 +414,11 @@ def test_sec_aggr(args, modules, trainset, testset, batch_norm,checkpoint=None,m
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -551,11 +551,11 @@ def test_end2end(args, modules, trainset, testset, checkpoint=None):
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -762,11 +762,11 @@ def test_end2end_fix_contrast(args, modules, trainset, testset, checkpoint=None)
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
@@ -948,11 +948,11 @@ def baseline_sec_aggr_end2end(args, modules, trainset, testset, checkpoint=None)
     if args.checkpoint:
         checkpoint = torch.load(args.checkpoint, map_location=torch.device('cpu'))
     if checkpoint is not None:
-        public_model.load_state_dict(checkpoint['public_model_state_dict'],device=args.device)
+        public_model.load_state_dict(checkpoint['public_model_state_dict'])
         public_model.to(args.device)
-        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'],device=args.device)
+        disaggregator.load_state_dict(checkpoint['disaggregator_state_dict'])
         disaggregator.to(args.device)
-        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'],device=args.device)
+        reconstructor.load_state_dict(checkpoint['reconstructor_state_dict'])
         reconstructor.to(args.device)
         current_epoch=checkpoint['epoch']
         losses=Losses( public_model.parameters(), args )
