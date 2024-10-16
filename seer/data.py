@@ -304,7 +304,7 @@ def filter_dataset_by_brightness(dataset, percent_remove=25):
     brightness_values = []
     datapoints = [dataset[i][0].unsqueeze(0) for i in range(len(dataset))]
     for datapoint in datapoints:
-        brightness_values.append(property_scores(datapoint))
+        brightness_values.append(property_scores(datapoint,'bright'))
     
     threshold = np.percentile(brightness_values, percent_remove)
     filtered_dataset = [(img, label) for (img, label), brightness in zip(dataset, brightness_values) if brightness > threshold]
