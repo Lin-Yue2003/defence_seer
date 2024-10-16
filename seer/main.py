@@ -8,7 +8,7 @@ import torch
 import distr
 
 args = get_args()
-args.dataset = 'datasets_Cifar10_modify'
+args.dataset = 'Cifar10_modify'
 print(f"trainset={args.dataset},prop={args.prop},batch_size={(args.batch_size_train[0] + args.batch_size_train[1])},num_clients={args.num_clients},res_path={args.res_path}")
 torch.manual_seed(args.rng_seed)
 torch.set_default_dtype(torch.float32)
@@ -18,7 +18,7 @@ batch_norm=torch.nn.BatchNorm1d(1, eps=1e-05, affine=False, track_running_stats=
 
 # CIFAR/TinyImageNet first layer
 # https://github.com/Westlake-AI/openmixup/blob/main/openmixup/models/backbones/resnet_mmcls.py#L716
-assert args.dataset in ['Cifar10', 'Cifar100', 'TinyImageNet', 'TinyImageNet_rsz', 'Cifar10_2', 'Cifar10_1','datasets_Cifar10_modify'] or args.dataset.startswith( 'Cifar10_C' )
+assert args.dataset in ['Cifar10', 'Cifar100', 'TinyImageNet', 'TinyImageNet_rsz', 'Cifar10_2', 'Cifar10_1','Cifar10_modify'] or args.dataset.startswith( 'Cifar10_C' )
 public_model = ResNet(BasicBlock, [2, 2, 2, 2], [64,128,256,512], args.act, num_classes=args.num_classes).to(args.device)
 
 par_sel=ParamSelector(public_model,args.par_sel_size,args.par_sel_frac,sparse_grad=False,seed=98)
