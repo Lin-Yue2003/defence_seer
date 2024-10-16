@@ -308,8 +308,8 @@ def filter_dataset_by_brightness(dataset, percent_remove=25):
         brightness = property_scores(datapoint, 'bright')
         brightness_values.append(brightness.item() if isinstance(brightness, torch.Tensor) else brightness)
     
-    threshold = np.percentile(brightness_values, percent_remove)
-    filtered_dataset = [(img, label) for (img, label), brightness in zip(dataset, brightness_values) if brightness > threshold]
+    threshold = np.percentile(brightness_values, 100-percent_remove)
+    filtered_dataset = [(img, label) for (img, label), brightness in zip(dataset, brightness_values) if brightness < threshold]
     
     return filtered_dataset
 def datasets_Cifar10_modify(percent_remove=25):
