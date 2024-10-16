@@ -9,6 +9,7 @@ import torchvision.transforms as transforms
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 from copy import copy
+from utils import *
 
 import numpy as np
 
@@ -299,4 +300,44 @@ def datasets_Cifar10():
     testset = torchvision.datasets.CIFAR10(root='../data', train=False, download=True, transform=transform_test)
 
     return trainset,testset
+def filter_dataset_by_brightness(dataset, percent_remove=25):
+    brightness_values = []
+    datapoints = [dataset[i][0].unsqueeze(0) for i in range(len(dataset))]
+    for datapoint in datapoints:
+        brightness_values.append(property_scores(datapoint))
+    
+    threshold = np.percentile(brightness_values, percent_remove)
+    filtered_dataset = [(img, label) for (img, label), brightness in zip(dataset, brightness_values) if brightness > threshold]
+    
+    return filtered_dataset
+def datasets_Cifar10_modify(percent_remove=25):
+    transform_train = transforms.Compose([
+        transforms.ColorJitter(brightness=0.2, contrast=0.1, saturation=0.1, hue=0.05),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomChoice([
+            transforms.RandomRotation((-5, 5), fill=255),
+            transforms.RandomRotation((85, 95), fill=255),
+            transforms.RandomRotation((175, 185), fill=255),
+            transforms.RandomRotation((-95, -85), fill=255)
+        ]),
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914672374725342, 0.4822617471218109, 0.4467701315879822), 
+                             (0.24703224003314972, 0.24348513782024384, 0.26158785820007324))
+    ])
+
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.4914672374725342, 0.4822617471218109, 0.4467701315879822), 
+                             (0.24703224003314972, 0.24348513782024384, 0.26158785820007324))
+    ])
+
+    trainset = torchvision.datasets.CIFAR10(root='../data', train=True, download=True, transform=transform_train)
+    testset = torchvision.datasets.CIFAR10(root='../data', train=False, download=True, transform=transform_test)
+
+    filtered_trainset = filter_dataset_by_brightness(trainset, percent_remove)
+    filtered_testset = filter_dataset_by_brightness(testset, percent_remove)
+
+    return filtered_trainset, filtered_testset
+
 
